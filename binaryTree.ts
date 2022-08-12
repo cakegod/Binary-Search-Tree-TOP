@@ -57,7 +57,7 @@ class Tree {
     return node;
   }
 
-  deleteNode(value, node?) {
+  deleteNode(value: number, node?: TreeNode) {
     // Set initial node to root
     if (node === undefined) {
       node = this.root;
@@ -73,7 +73,6 @@ class Tree {
         return (node = null);
       }
 
-      node;
       // If only one child then copy the value of the non-null child to current node & delete child.
       if (node.right !== null && node.left === null) {
         node.value = node.right.value;
@@ -86,7 +85,7 @@ class Tree {
       // Two children
       if (node.left !== null && node.right !== null) {
         // Get the inorder successor value
-        let successor = this.findInorderSucc(node.right).value;
+        let successor = this.findInorderSuc(node.right).value;
         // Delete the inorder successor
         this.deleteNode(successor);
         // Copy the value to the node
@@ -104,9 +103,9 @@ class Tree {
     return node;
   }
 
-  findInorderSucc(node) {
+  findInorderSuc(node: TreeNode) {
     if (!node.left) return node;
-    return this.findInorderSucc(node.left);
+    return this.findInorderSuc(node.left);
   }
 
   find(search: number, node?: TreeNode | null): TreeNode | null {
@@ -130,6 +129,45 @@ class Tree {
     return null
 
   }
+
+  levelOrder(func?: Function): number[] | void {
+    const values: number[] = [];
+    const queue = [this.root]
+    while (queue.length) {
+      const node = queue.pop()
+      if (node.left) queue.unshift(node.left)
+      if (node.right) queue.unshift(node.right)
+      func === undefined ? values.push(node.value) : func(node)
+    }
+    if (values.length) {
+      return values
+    }
+  }
+
+  // left => node => right
+  inorder(node: TreeNode, values = [], func?): number[] | void {
+
+    if (node === undefined) node = this.root;
+    if (node) {
+      values.push(node.value)
+      if (node.left) this.inorder(node.left, values)
+      if (node.right) this.inorder(node.right, values)
+    }
+    return values
+  }
+
+  // node => left => right
+  preorder(func?: Function): number[] | void {
+
+
+  }
+
+  // left => right => node
+  postorder(func?: Function): number[] | void {
+
+
+  }
+
 }
 
 const tree = new Tree([1, 2, 3, 4, 5, 6, 7]);

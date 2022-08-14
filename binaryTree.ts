@@ -131,12 +131,54 @@ class Tree {
   }
 
   levelOrder(func?: Function): number[] | void {
-    const values: number[] = [];
+    const arr: number[] = [];
     const queue = [this.root]
     while (queue.length) {
       const node = queue.pop()
       if (node.left) queue.unshift(node.left)
       if (node.right) queue.unshift(node.right)
+      func === undefined ? arr.push(node.value) : func(node)
+    }
+    if (arr.length) {
+      return arr
+    }
+  }
+
+
+  // node => left => right
+  preorder(node: TreeNode | undefined, arr: number[] = [], func?: Function): number[] | void {
+    if (node === undefined) node = this.root;
+    if (node) {
+      func === undefined ? arr.push(node.value) : func(node)
+      if (node.left) this.inorder(node.left, arr)
+      if (node.right) this.inorder(node.right, arr)
+    }
+    if (arr.length) {
+      return arr
+    }
+
+  }
+
+  // left => node => right
+  inorder(node: TreeNode | undefined, arr: number[] = [], func?: Function): number[] | void {
+    if (node === undefined) node = this.root;
+    if (node) {
+      if (node.left) this.inorder(node.left, arr)
+      func === undefined ? arr.push(node.value) : func(node)
+      if (node.right) this.inorder(node.right, arr)
+    }
+    if (arr.length) {
+      return arr
+    }
+  }
+
+
+  // left => right => node
+  postorder(node: TreeNode | undefined, values: number[] = [], func?: Function): number[] | void {
+    if (node === undefined) node = this.root;
+    if (node) {
+      if (node.left) this.inorder(node.left, values)
+      if (node.right) this.inorder(node.right, values)
       func === undefined ? values.push(node.value) : func(node)
     }
     if (values.length) {
@@ -144,30 +186,7 @@ class Tree {
     }
   }
 
-  // left => node => right
-  inorder(node: TreeNode, values = [], func?): number[] | void {
-
-    if (node === undefined) node = this.root;
-    if (node) {
-      values.push(node.value)
-      if (node.left) this.inorder(node.left, values)
-      if (node.right) this.inorder(node.right, values)
-    }
-    return values
-  }
-
-  // node => left => right
-  preorder(func?: Function): number[] | void {
-
-
-  }
-
-  // left => right => node
-  postorder(func?: Function): number[] | void {
-
-
-  }
-
 }
+
 
 const tree = new Tree([1, 2, 3, 4, 5, 6, 7]);

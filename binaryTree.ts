@@ -39,24 +39,6 @@ class Tree {
     return node;
   }
 
-  insert(value: number, node?: TreeNode | null) {
-    if (node === undefined) {
-      node = this.root;
-    }
-
-    if (node === null) {
-      return new TreeNode(value);
-    }
-
-    if (node.value < value) {
-      node.left = this.insert(value, node.left);
-    } else if (node.value > value) {
-      node.right = this.insert(value, node.right);
-    }
-
-    return node;
-  }
-
   deleteNode(value: number, node?: TreeNode) {
     // Set initial node to root
     if (node === undefined) {
@@ -108,7 +90,7 @@ class Tree {
     return this.findInorderSuc(node.left);
   }
 
-  find(search: number, node?: TreeNode | null): TreeNode | null {
+  find(search: number | TreeNode, node?: TreeNode | null): TreeNode | null {
     if (node === undefined) {
       node = this.root;
     }
@@ -130,7 +112,7 @@ class Tree {
 
   }
 
-  levelOrder(func?: Function): number[] | void {
+  levelOrder(func?: Function): number[] {
     const arr: number[] = [];
     const queue = [this.root]
     while (queue.length) {
@@ -172,7 +154,6 @@ class Tree {
     }
   }
 
-
   // left => right => node
   postorder(node: TreeNode | undefined, values: number[] = [], func?: Function): number[] | void {
     if (node === undefined) node = this.root;
@@ -186,7 +167,113 @@ class Tree {
     }
   }
 
+  height(node: number | TreeNode): number {
+    let foundNode = node;
+    if (foundNode === undefined) {
+      foundNode = this.root
+
+    }
+
+    // If node parameter is a number, then find the node with that value
+    if (typeof foundNode === "number") {
+      foundNode = this.find(node)
+    }
+
+    if (foundNode === null) {
+      return -1
+    } else {
+      // Compute the height of the node
+      let lDepth = this.height(foundNode.left);
+      let rDepth = this.height(foundNode.right);
+
+      // Use the largest number between lDepth and rDepth
+      if (lDepth > rDepth)
+        return (lDepth + 1);
+      else
+        return (rDepth + 1);
+    }
+  }
+
+  depth(node: TreeNode | number, currentNode: TreeNode, depth: number = 0): number {
+    if (currentNode === undefined) {
+      currentNode = this.root;
+    }
+
+    if (typeof node === "number") {
+      node = this.find(node)
+    }
+
+    if (currentNode === null) {
+      return null;
+    }
+
+    if (currentNode.value === node.value) {
+      return depth;
+    }
+
+    if (currentNode.value > node.value) {
+      depth++
+      return this.depth(node, currentNode.left, depth);
+    } else if (currentNode.value < node.value) {
+      depth++
+      return this.depth(node, currentNode.right, depth);
+    }
+  }
+
+  isBalanced(): "balanced" | "unbalanced" | null {
+    if (this.root === null) {
+      return null
+    }
+    const leftHeight = this.height(this.root.left)
+    const rightHeight = this.height(this.root.right)
+
+    switch (leftHeight) {
+      case rightHeight:
+      case rightHeight - 1:
+      case rightHeight + 1:
+        return "balanced"
+      default:
+        return "unbalanced"
+    }
+  }
+
+  rebalance() {
+    const balancedTree = this.mergeSort(this.levelOrder())
+    this.root = this.buildTree(balancedTree)
+  }
+
+  mergeSort(arr: number[]): number[] {
+    // Return when there is only an element
+    if (arr.length === 1) {
+      return arr;
+    }
+
+    const middle = Math.ceil(arr.length / 2);
+    const left = arr.slice(0, middle);
+    const right = arr.slice(middle);
+
+    // Call mergeSort until there's only one element on each side
+    return merger(this.mergeSort(left), this.mergeSort(right));
+
+    function merger(left: number[], right: number[]): number[] {
+      const sorted: number[] = [];
+
+      while (left.length && right.length) {
+        // Push the smallest number to sorted
+        if (left[0] < right[0]) {
+          sorted.push(left.shift());
+        } else {
+          sorted.push(right.shift());
+        }
+      }
+
+      // Join the three arrays
+      return sorted.concat(right.concat(left));
+    }
+  }
+
 }
 
 
 const tree = new Tree([1, 2, 3, 4, 5, 6, 7]);
+tree.height(27)
